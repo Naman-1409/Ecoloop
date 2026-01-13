@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Coins, Flame, LogOut } from 'lucide-react';
+import { Leaf, Coins, Flame, LogOut, Trophy } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
 
@@ -40,6 +40,11 @@ const Header = () => {
                             <Coins className="w-5 h-5 text-yellow-600 fill-yellow-400" />
                             <span className="font-bold text-yellow-800">{user.coins}</span>
                         </div>
+
+                        {/* Leaderboard Link */}
+                        <Link to="/leaderboard" className="p-2 bg-yellow-50 text-yellow-600 rounded-full hover:bg-yellow-100 transition shadow-sm ml-1" title="Leaderboard">
+                            <Trophy className="w-5 h-5" />
+                        </Link>
         
                         {/* Profile Link */}
                         <Link to="/profile">

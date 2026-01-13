@@ -105,6 +105,16 @@ export const GameProvider = ({ children }) => {
         }
     };
 
+    const fetchLeaderboard = async () => {
+        try {
+            const res = await api.get('/leaderboard');
+            return res.data;
+        } catch (err) {
+            console.error("Fetch Leaderboard Failed", err);
+            return [];
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         setUser(null);
@@ -189,7 +199,8 @@ export const GameProvider = ({ children }) => {
             logout,
             verifyTask,
             updateProgress,
-            getLevelStatus
+            getLevelStatus,
+            fetchLeaderboard
         }}>
             {children}
         </GameContext.Provider>

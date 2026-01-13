@@ -75,6 +75,20 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     
     # Create Token
     access_token = auth.create_access_token(data={"sub": new_user.username})
+
+    # Initialize Progress (Unlock Level 1)
+    # Get Level 1 ID
+    level1 = db.query(models.Level).filter(models.Level.order == 1).first()
+    if level1:
+        new_progress = models.UserProgress(
+            user_id=new_user.id,
+            level_id=level1.id,
+            status="UNLOCKED",
+            score=0
+        )
+        db.add(new_progress)
+        db.commit()
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/login", response_model=schemas.Token)
@@ -137,6 +151,12 @@ def update_progress(
 @app.get("/levels", response_model=List[schemas.Level])
 def get_levels(db: Session = Depends(database.get_db)):
     return db.query(models.Level).all()
+
+@app.get("/leaderboard")
+def get_leaderboard(db: Session = Depends(database.get_db)):
+    # Return top 10 users by coins, then streak
+    users = db.query(models.User).order_by(models.User.coins.desc(), models.User.streak.desc()).limit(10).all()
+    return [{"username": u.username, "coins": u.coins, "streak": u.streak} for u in users]
 
 # --- AI Verification Route ---
 @app.post("/verify-task")
