@@ -3,7 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, X, Flame } from 'lucide-react';
 import moment from 'moment';
 
+import { useGame } from '../../context/GameContext';
+
 const StreakCalendar = ({ isOpen, onClose, streak }) => {
+    const { user } = useGame();
     if (!isOpen) return null;
 
     // Generate full current month
@@ -80,18 +83,32 @@ const StreakCalendar = ({ isOpen, onClose, streak }) => {
                             {calendarDays.map((day, idx) => {
                                 if (!day) return <div key={idx}></div>;
 
+                                const dateStr = day.format('YYYY-MM-DD');
                                 const isToday = day.isSame(moment(), 'day');
-                                const isChecked = checkedDates.includes(day.format('YYYY-MM-DD'));
                                 const isFuture = day.isAfter(moment(), 'day');
+
+                                // Check real completion history from user object
+                                // We need access to user context here. 
+                                // Since this component is presentational, we should probably pass 'completions' prop or use useGame hook.
+                                // Let's use useGame hook inside this component or just assume 'streak' prop is insufficient.
+                                // BUT, wait. I can't easily change the props passed from Header without editing Header.
+                                // Let's use useGame() to get the user object directly.
+
+                                const isCompleted = user?.challenge_completions?.some(c => c.completion_date === dateStr);
 
                                 return (
                                     <div key={idx} className="flex flex-col items-center">
                                         {isToday ? (
-                                            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg transform scale-110 border-2 border-[#1a1a1a]">
-                                                {/* Tick mark for Today */}
-                                                <CheckCircle size={20} className="text-white" strokeWidth={3} />
-                                            </div>
-                                        ) : isChecked ? (
+                                            isCompleted ? (
+                                                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-lg transform scale-110 border-2 border-[#1a1a1a]">
+                                                    <CheckCircle size={20} className="text-white" strokeWidth={3} />
+                                                </div>
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-gray-700 border-2 border-[#1a1a1a] shadow-lg transform scale-110">
+                                                    {day.date()}
+                                                </div>
+                                            )
+                                        ) : isCompleted ? (
                                             <div className="w-10 h-10 flex items-center justify-center">
                                                 <div className="w-8 h-8 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500">
                                                     <CheckCircle size={16} fill="currentColor" className="text-black" />

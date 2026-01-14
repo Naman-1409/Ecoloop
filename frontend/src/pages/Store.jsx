@@ -61,10 +61,10 @@ const Store = () => {
 
     const getIcon = (type) => {
         switch (type) {
-            case 'tree': return <TreePine className="w-12 h-12 text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.3)]" />;
             case 'hoodie': return <Shirt className="w-12 h-12 text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.3)]" />;
             case 'bottle': return <Droplet className="w-12 h-12 text-blue-500 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]" />;
             case 'badge': return <Award className="w-12 h-12 text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.3)]" />;
+            case 'tree': return <TreePine className="w-12 h-12 text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.3)]" />;
             case 'water': return <Droplet className="w-12 h-12 text-cyan-500 drop-shadow-[0_0_10px_rgba(6,182,212,0.3)]" />;
             case 'zap': return <Zap className="w-12 h-12 text-yellow-400 fill-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />;
             default: return <Star className="w-12 h-12 text-gray-400" />;

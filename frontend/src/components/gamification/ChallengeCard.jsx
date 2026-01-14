@@ -2,12 +2,11 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Calendar, CheckCircle2, Coins, ArrowRight, Loader, Upload, AlertCircle } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
-import CompleteAnimation from "./CompleteAnimation";
 
-const ChallengeCard = ({ challenge }) => {
+
+const ChallengeCard = ({ challenge, onComplete }) => {
     const { completeChallenge } = useGame();
     const [loading, setLoading] = useState(false);
-    const [showAnimation, setShowAnimation] = useState(false);
     const [error, setError] = useState(null);
     const fileInputRef = useRef(null);
 
@@ -22,7 +21,7 @@ const ChallengeCard = ({ challenge }) => {
         setLoading(false);
 
         if (res.success) {
-            setShowAnimation(true);
+            if (onComplete) onComplete();
         } else {
             setError(res.message);
         }
@@ -114,11 +113,7 @@ const ChallengeCard = ({ challenge }) => {
                     }`}></div>
             </motion.div>
 
-            <CompleteAnimation
-                show={showAnimation}
-                challenge={challenge}
-                onClose={() => setShowAnimation(false)}
-            />
+
         </>
     );
 };

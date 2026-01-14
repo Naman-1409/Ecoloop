@@ -146,12 +146,13 @@ export const GameProvider = ({ children }) => {
         }
     };
 
-    const updateProgress = async (levelId, coinsEarned, xpEarned) => {
+    const updateProgress = async (levelId, coinsEarned, xpEarned, isLevelCompletion = true) => {
         try {
             const res = await api.post('/users/progress', {
                 level_id: levelId,
                 coins_earned: coinsEarned,
-                xp_earned: xpEarned
+                xp_earned: xpEarned,
+                is_level_completion: isLevelCompletion
             });
             // Update local user state
             if (user) {

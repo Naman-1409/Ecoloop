@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, ArrowRight, Zap, Coins } from 'lucide-react';
+import { CheckCircle2, X } from 'lucide-react';
+import { useGame } from '../../context/GameContext';
 import confetti from 'canvas-confetti';
 
-const CompletionAnimation = ({ show, challenge, onClose }) => {
+const CompleteAnimation = ({ show, challenge, onClose }) => {
+    const { user } = useGame();
+
     useEffect(() => {
         if (show) {
             const duration = 3 * 1000;
@@ -12,7 +16,7 @@ const CompletionAnimation = ({ show, challenge, onClose }) => {
 
             const randomInRange = (min, max) => Math.random() * (max - min) + min;
 
-            const interval = setInterval(function() {
+            const interval = setInterval(function () {
                 const timeLeft = animationEnd - Date.now();
 
                 if (timeLeft <= 0) {
@@ -20,7 +24,6 @@ const CompletionAnimation = ({ show, challenge, onClose }) => {
                 }
 
                 const particleCount = 50 * (timeLeft / duration);
-                // since particles fall down, start a bit higher than random
                 confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
                 confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
             }, 250);
@@ -34,67 +37,78 @@ const CompletionAnimation = ({ show, challenge, onClose }) => {
             {show && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     {/* Backdrop */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                     />
 
                     {/* Modal */}
                     <motion.div
-                        initial={{ scale: 0.8, opacity: 0, y: 50 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.8, opacity: 0, y: 50 }}
-                        className="relative bg-white rounded-[3rem] p-12 max-w-md w-full shadow-2xl text-center overflow-hidden border border-gray-100"
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        className="relative bg-[#1a1a1a] rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center border border-gray-800 overflow-hidden"
                     >
-                        {/* Background Orbs */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-400/20 rounded-full blur-3xl -ml-16 -mb-16"></div>
+                        {/* Close Button */}
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
 
-                        <div className="relative z-10">
-                            <motion.div 
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
-                                className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-yellow-500/30"
-                            >
-                                <Trophy className="w-12 h-12 text-white" />
-                            </motion.div>
-
-                            <h2 className="text-4xl font-black text-gray-900 mb-2">Well Done!</h2>
-                            <p className="text-gray-500 font-bold mb-8">You completed your {challenge?.type} task!</p>
-
-                            <div className="bg-gray-50 rounded-[2rem] p-6 mb-8 text-left border border-gray-100 italic font-medium text-gray-600">
-                                "{challenge?.title}"
+                        {/* Success Header */}
+                        <div className="flex items-center justify-center gap-2 mb-8">
+                            <div className="bg-green-500 rounded-full p-1">
+                                <CheckCircle2 size={16} className="text-white bg-green-500 rounded-full" />
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-10">
-                                <div className="bg-emerald-50 rounded-3xl p-4 border border-emerald-100">
-                                    <div className="flex items-center gap-2 justify-center mb-1">
-                                        <Coins className="w-5 h-5 text-emerald-600" />
-                                        <span className="text-2xl font-black text-emerald-700">+{challenge?.coin_reward}</span>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">EcoCoins</span>
-                                </div>
-                                <div className="bg-amber-50 rounded-3xl p-4 border border-amber-100">
-                                    <div className="flex items-center gap-2 justify-center mb-1">
-                                        <Zap className="w-5 h-5 text-amber-600 fill-amber-400" />
-                                        <span className="text-2xl font-black text-amber-700">{challenge?.type === 'daily' ? '+1' : '0'}</span>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Streak Bonus</span>
-                                </div>
-                            </div>
-
-                            <button 
-                                onClick={onClose}
-                                className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 group shadow-xl hover:shadow-emerald-200"
-                            >
-                                <span>Continue Exploring</span>
-                                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                            </button>
+                            <h2 className="text-lg font-bold text-white tracking-wide">
+                                {challenge?.type === 'daily' ? 'Daily' : 'Weekly'} Challenge Completed!
+                            </h2>
                         </div>
+
+                        {/* Streak Info */}
+                        <div className="mb-2">
+                            <h3 className="text-2xl font-bold text-white mb-2">
+                                Completion Streak: <span className="text-blue-500">{user?.streak || 1} Days</span>
+                            </h3>
+                            <p className="text-gray-400 text-sm font-medium">
+                                Consistency is key, see you tomorrow!
+                            </p>
+                        </div>
+
+                        {/* Coin Animation */}
+                        <div className="h-40 flex items-center justify-center mt-6 mb-2">
+                            <div className="relative w-24 h-24">
+                                <motion.div
+                                    animate={{ rotateY: 360 }}
+                                    transition={{
+                                        repeat: Infinity,
+                                        duration: 3,
+                                        ease: "linear"
+                                    }}
+                                    className="w-full h-full"
+                                    style={{ transformStyle: 'preserve-3d' }}
+                                >
+                                    {/* Coin Visual - CSS implementation of a Gold Coin */}
+                                    <div className="w-full h-full rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 shadow-lg flex items-center justify-center border-4 border-yellow-600 relative">
+                                        {/* Inner Ring */}
+                                        <div className="w-[85%] h-[85%] rounded-full border-2 border-yellow-300/50 flex items-center justify-center bg-yellow-500">
+                                            {/* Logo/Icon */}
+                                            <span className="text-4xl font-black text-yellow-100 drop-shadow-md">
+                                                $
+                                            </span>
+                                        </div>
+                                        {/* Shine effect */}
+                                        <div className="absolute top-2 left-4 w-6 h-6 bg-white/40 rounded-full blur-sm"></div>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </div>
+
                     </motion.div>
                 </div>
             )}
@@ -102,4 +116,4 @@ const CompletionAnimation = ({ show, challenge, onClose }) => {
     );
 };
 
-export default CompletionAnimation;
+export default CompleteAnimation;

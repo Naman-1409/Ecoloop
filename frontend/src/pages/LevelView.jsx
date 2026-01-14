@@ -23,14 +23,29 @@ const LevelView = () => {
         }
     }, [levels, id]);
 
-    const handleVideoComplete = () => setStep('info');
+    const handleVideoComplete = async () => {
+        // Award 10 Coins for watching video (not level completion)
+        const success = await updateProgress(levelData.id, 10, 0, false);
+        if (success) {
+            // Optional: Toast notification here if desired
+            console.log("Video Reward: +10 Coins");
+        }
+        setStep('info');
+    };
     const handleInfoRead = () => setStep('quiz');
+
+    const handleCorrectAnswer = async () => {
+        // Award 5 Coins per correct answer (not level completion)
+        await updateProgress(levelData.id, 5, 0, false);
+    };
+
     const handleQuizPass = () => setStep('task');
     const handleTaskVerified = async () => {
         if (levelData) {
-            const success = await updateProgress(levelData.id, levelData.xp_reward, levelData.xp_reward);
+            // Award 20 Coins for Task + XP Reward + Mark Level Completed
+            const success = await updateProgress(levelData.id, 20, levelData.xp_reward, true);
             if (success) {
-                alert(`Level Completed! +${levelData.xp_reward} EcoCoins 🪙`);
+                alert(`Level Completed! +${levelData.xp_reward} XP & +20 EcoCoins 🪙`);
                 navigate('/dashboard');
             } else {
                 alert("Failed to save progress. Please try again.");
@@ -120,7 +135,7 @@ const LevelView = () => {
                             </button>
                         </div>
                     )}
-                    {step === 'quiz' && <QuizInterface onPass={handleQuizPass} questions={levelData.questions} />}
+                    {step === 'quiz' && <QuizInterface onPass={handleQuizPass} onCorrectAnswer={handleCorrectAnswer} questions={levelData.questions} />}
                     {step === 'task' && <TaskUpload onSuccess={handleTaskVerified} taskDescription={levelData.task_description} taskType="Level Challenge" levelId={levelData.id} />}
                 </div>
             </main>

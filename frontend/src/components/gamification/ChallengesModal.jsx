@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Calendar, Target, Loader } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import ChallengeCard from './ChallengeCard';
+import CompleteAnimation from './CompleteAnimation';
 
 const ChallengesModal = ({ isOpen, onClose }) => {
     const { getChallenges, user } = useGame();
@@ -25,12 +26,18 @@ const ChallengesModal = ({ isOpen, onClose }) => {
     const dailyChallenge = challenges.find(c => c.type === 'daily');
     const weeklyChallenge = challenges.find(c => c.type === 'weekly');
 
+    const [completedChallenge, setCompletedChallenge] = useState(null);
+
+    const handleChallengeComplete = (challenge) => {
+        setCompletedChallenge(challenge);
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     {/* Backdrop */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -53,7 +60,7 @@ const ChallengesModal = ({ isOpen, onClose }) => {
                                 </div>
                                 <h2 className="text-2xl font-black text-gray-900 tracking-tight">Eco Challenges</h2>
                             </div>
-                            <button 
+                            <button
                                 onClick={onClose}
                                 className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-900"
                             >
@@ -74,10 +81,10 @@ const ChallengesModal = ({ isOpen, onClose }) => {
                                     <section>
                                         <div className="flex items-center gap-2 mb-4 px-2">
                                             <Zap className="text-amber-500 fill-amber-400 w-4 h-4" />
-                                            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">Daily Task</h3>
+                                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Daily Task</h3>
                                         </div>
                                         {dailyChallenge ? (
-                                            <ChallengeCard challenge={dailyChallenge} />
+                                            <ChallengeCard challenge={dailyChallenge} onComplete={() => handleChallengeComplete(dailyChallenge)} />
                                         ) : (
                                             <div className="bg-white rounded-3xl p-8 text-center border-2 border-dashed border-gray-200">
                                                 <p className="text-gray-400 font-medium">No daily challenges today!</p>
@@ -89,10 +96,10 @@ const ChallengesModal = ({ isOpen, onClose }) => {
                                     <section>
                                         <div className="flex items-center gap-2 mb-4 px-2">
                                             <Calendar className="text-purple-500 w-4 h-4" />
-                                            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">Weekly Goal</h3>
+                                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Weekly Goal</h3>
                                         </div>
                                         {weeklyChallenge ? (
-                                            <ChallengeCard challenge={weeklyChallenge} />
+                                            <ChallengeCard challenge={weeklyChallenge} onComplete={() => handleChallengeComplete(weeklyChallenge)} />
                                         ) : (
                                             <div className="bg-white rounded-3xl p-8 text-center border-2 border-dashed border-gray-200">
                                                 <p className="text-gray-400 font-medium">No weekly goals active!</p>
@@ -102,19 +109,25 @@ const ChallengesModal = ({ isOpen, onClose }) => {
                                 </div>
                             )}
                         </div>
-                        
+
                         {/* Footer Tips */}
                         <div className="bg-emerald-50 p-6 flex items-center gap-4 border-t border-emerald-100">
-                           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                               🌱
-                           </div>
-                           <p className="text-xs font-bold text-emerald-700 leading-relaxed">
-                               Completing daily tasks keeps your streak alive! Weekly goals give extra EcoCoins for the shop.
-                           </p>
+                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                                🌱
+                            </div>
+                            <p className="text-xs font-bold text-emerald-700 leading-relaxed">
+                                Completing daily tasks keeps your streak alive! Weekly goals give extra EcoCoins for the shop.
+                            </p>
                         </div>
                     </motion.div>
                 </div>
             )}
+            {/* Global Animation for Modal */}
+            <CompleteAnimation
+                show={!!completedChallenge}
+                challenge={completedChallenge}
+                onClose={() => setCompletedChallenge(null)}
+            />
         </AnimatePresence>
     );
 };

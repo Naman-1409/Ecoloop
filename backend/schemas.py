@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import date
 
 # --- Auth Schemas ---
 class Token(BaseModel):
@@ -19,6 +20,13 @@ class UserLogin(BaseModel):
     password: str
 
 # --- Game Data Schemas ---
+
+class ChallengeCompletion(BaseModel):
+    challenge_id: int
+    completion_date: date
+
+    class Config:
+        from_attributes = True
 
 class LevelBase(BaseModel):
     title: str
@@ -68,6 +76,7 @@ class UserResponse(BaseModel):
     streak: int
     profile_image: Optional[str] = None
     progress: List[UserProgress] = []
+    challenge_completions: List[ChallengeCompletion] = []
 
     class Config:
         from_attributes = True
@@ -81,6 +90,7 @@ class ProgressUpdate(BaseModel):
     level_id: int
     coins_earned: int
     xp_earned: int
+    is_level_completion: bool = True
 
 # --- Chat Schemas ---
 
@@ -106,7 +116,8 @@ class StoreItemSchema(BaseModel):
 class PurchaseRequest(BaseModel):
     item_id: int
 
-# --- Challenge Schemas ---
+
+
 class ChallengeSchema(BaseModel):
     id: int
     title: str

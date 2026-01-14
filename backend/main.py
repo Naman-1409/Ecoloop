@@ -137,7 +137,10 @@ def update_progress(
 ):
     # 1. Update User Coins & Streak
     current_user.coins += progress_data.coins_earned
-    update_user_streak(current_user, db)
+    
+    # Only update streak if it's a level completion (task verified)
+    if progress_data.is_level_completion:
+        update_user_streak(current_user, db)
     
     # 2. Check/Update UserProgress for this Level
     user_progress = db.query(models.UserProgress).filter(
@@ -146,39 +149,44 @@ def update_progress(
     ).first()
     
     if user_progress:
-        if user_progress.status != "completed":
+        # Only mark completed if this IS a completion event
+        if progress_data.is_level_completion and user_progress.status != "completed":
              user_progress.status = "completed"
              user_progress.score = max(user_progress.score, progress_data.xp_earned) 
     else:
+        # Create progress entry
+        # If not completion (e.g. just video), status remains 'unlocked' or whatever default
+        new_status = "completed" if progress_data.is_level_completion else "unlocked"
         user_progress = models.UserProgress(
             user_id=current_user.id,
             level_id=progress_data.level_id,
-            status="completed",
-            score=progress_data.xp_earned
+            status=new_status,
+            score=progress_data.xp_earned if progress_data.is_level_completion else 0
         )
         db.add(user_progress)
     
-    # 3. Unlock Next Level
-    current_level = db.query(models.Level).filter(models.Level.id == progress_data.level_id).first()
-    if current_level:
-        next_level = db.query(models.Level).filter(models.Level.order == current_level.order + 1).first()
-        if next_level:
-            # Check if next level progress already exists
-            next_progress = db.query(models.UserProgress).filter(
-                models.UserProgress.user_id == current_user.id,
-                models.UserProgress.level_id == next_level.id
-            ).first()
-            
-            if not next_progress:
-                next_progress = models.UserProgress(
-                    user_id=current_user.id,
-                    level_id=next_level.id,
-                    status="unlocked",
-                    score=0
-                )
-                db.add(next_progress)
-            elif next_progress.status == "locked":
-                next_progress.status = "unlocked"
+    # 3. Unlock Next Level (ONLY on completion)
+    if progress_data.is_level_completion:
+        current_level = db.query(models.Level).filter(models.Level.id == progress_data.level_id).first()
+        if current_level:
+            next_level = db.query(models.Level).filter(models.Level.order == current_level.order + 1).first()
+            if next_level:
+                # Check if next level progress already exists
+                next_progress = db.query(models.UserProgress).filter(
+                    models.UserProgress.user_id == current_user.id,
+                    models.UserProgress.level_id == next_level.id
+                ).first()
+                
+                if not next_progress:
+                    next_progress = models.UserProgress(
+                        user_id=current_user.id,
+                        level_id=next_level.id,
+                        status="unlocked",
+                        score=0
+                    )
+                    db.add(next_progress)
+                elif next_progress.status == "locked":
+                    next_progress.status = "unlocked"
         
     db.commit()
     db.refresh(current_user)
@@ -361,8 +369,8 @@ async def complete_challenge(
             content = await file.read()
             buffer.write(content)
         
-        # Use verification_label from challenge
-        label = challenge.verification_label or challenge.title
+        # Use challenge description to match Level Task verification logic (which uses task_description)
+        label = challenge.description or challenge.title
         verification = await ai_service.verify_task_content(temp_path, file.content_type, label)
         
         if not verification.get("is_valid"):
@@ -500,10 +508,10 @@ def seed_data(db: Session = Depends(database.get_db)):
     # 3. Seed Challenges
     if db.query(models.Challenge).count() == 0:
         challenges_data = [
-            {"title": "Nature Appreciation", "description": "Find a tree or plant and take a photo to show you appreciate nature!", "coin_reward": 50, "type": "daily", "verification_label": "tree, plant, green nature, leaves"},
-            {"title": "Water Saver", "description": "Limit your shower to 5 minutes.", "coin_reward": 50, "type": "daily", "verification_label": "shower timer or water saving fixture"},
-            {"title": "Weekly Cleanup", "description": "Clean up a local park or street for 1 hour.", "coin_reward": 250, "type": "weekly", "verification_label": "person collecting trash outdoors with a bag"},
-            {"title": "Vegetarian Week", "description": "Eat no meat for a full week.", "coin_reward": 500, "type": "weekly", "verification_label": "vegetarian meal without any meat"},
+            {"title": "Nature Appreciation", "description": "Find a tree and take a photo to show you appreciate nature!", "coin_reward": 20, "type": "daily", "verification_label": "tree, plant, green nature, leaves"},
+            {"title": "Water Saver", "description": "Limit your shower to 5 minutes.", "coin_reward": 20, "type": "daily", "verification_label": "shower timer or water saving fixture"},
+            {"title": "Weekly Cleanup", "description": "Clean up a local park or street for 1 hour.", "coin_reward": 20, "type": "weekly", "verification_label": "person collecting trash outdoors with a bag"},
+            {"title": "Vegetarian Week", "description": "Eat no meat for a full week.", "coin_reward": 20, "type": "weekly", "verification_label": "vegetarian meal without any meat"},
         ]
         for c in challenges_data:
             db_challenge = models.Challenge(**c)
