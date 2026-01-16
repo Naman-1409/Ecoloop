@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, Award, Camera } from 'lucide-react';
 
-import Footer from '../components/common/Footer';
+
 
 const Landing = () => {
   return (
@@ -63,7 +63,19 @@ const Landing = () => {
           />
         </div>
       </section>
-      <Footer />
+      <section className="bg-green-600/10 py-16 px-6 w-full text-center">
+        <h2 className="text-3xl font-bold text-green-800 mb-4">Have Questions or Ideas?</h2>
+        <p className="text-lg text-green-700 mb-8 max-w-2xl mx-auto">
+          We'd love to hear from you! Whether you're an NGO looking to partner or an adventurer with a suggestion, get in touch with us.
+        </p>
+        <Link to="/contact">
+          <button className="bg-green-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-green-700 transition shadow-lg hover:shadow-green-200">
+            Contact Us ✉️
+          </button>
+        </Link>
+      </section>
+
+
     </div>
   );
 };

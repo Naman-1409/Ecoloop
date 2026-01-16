@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Compass, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import Footer from '../components/common/Footer';
+
 
 const Dashboard = () => {
     return (
@@ -44,9 +44,7 @@ const Dashboard = () => {
                 </div>
 
             </main>
-            <div className="z-50 relative bg-white">
-                <Footer />
-            </div>
+
         </div>
     );
 };

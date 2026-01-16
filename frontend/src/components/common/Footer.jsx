@@ -9,8 +9,6 @@ const Footer = () => {
                     © 2026 EcoLoop. All rights reserved.
                 </div>
                 <div className="flex gap-6 font-bold text-slate-600">
-                    <Link to="/about" className="hover:text-green-600 transition">About Us</Link>
-                    <Link to="/contact" className="hover:text-green-600 transition">Contact Us</Link>
                     <Link to="/community" className="hover:text-green-600 transition">Community</Link>
                 </div>
             </div>

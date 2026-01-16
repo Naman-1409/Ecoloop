@@ -11,6 +11,7 @@ from typing import List
 from datetime import date, timedelta
 import os
 import time
+import email_utils
 
 # Initialize DB
 models.Base.metadata.create_all(bind=database.engine)
@@ -600,10 +601,35 @@ def seed_full_data(db: Session = Depends(database.get_db)):
 
 
 @app.post("/contact")
-def create_ngo_request(request: schemas.NGORequestCreate, db: Session = Depends(database.get_db)):
+async def create_ngo_request(request: schemas.NGORequestCreate, db: Session = Depends(database.get_db)):
     new_request = models.NGORequest(**request.dict())
     db.add(new_request)
     db.commit()
+    
+    # Send Email
+    try:
+        email_service = email_utils.EmailService()
+        subject = f"New NGO Request: {request.org_name}"
+        body = f"""
+        <h1>New Partnership Request</h1>
+        <p><strong>Organization:</strong> {request.org_name}</p>
+        <p><strong>Email:</strong> {request.email}</p>
+        <p><strong>Location:</strong> {request.location}</p>
+        <p><strong>Category:</strong> {request.category}</p>
+        <p><strong>Website:</strong> {request.website}</p>
+        <p><strong>Description:</strong> {request.description}</p>
+        """
+        # Send to admin (using the configured MAIL_USERNAME as admin for now, or a specific admin email)
+        # Using the sender email as recipient for self-notification
+        admin_email = os.getenv("MAIL_USERNAME") 
+        if admin_email:
+            await email_service.send_contact_email(subject, admin_email, body)
+            
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        # Build success but warn about email? Or just ignore for prototype robustness
+        pass
+        
     return {"message": "Request received. We will review your submission shortly."}
 
 

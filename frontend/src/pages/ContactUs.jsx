@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Header from '../components/common/Header';
-import Footer from '../components/common/Footer';
+
 
 const ContactUs = () => {
     const [formData, setFormData] = useState({
@@ -97,7 +97,7 @@ const ContactUs = () => {
                     )}
                 </div>
             </main>
-            <Footer />
+
         </div>
     );
 };

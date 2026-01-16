@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Header from '../components/common/Header';
-import Footer from '../components/common/Footer';
+
 
 const Community = () => {
     const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ const Community = () => {
                     <p>Content here</p>
                 )}
             </main>
-            <Footer />
+
         </div>
     );
 };
