@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Medal, Crown, Flame, Coins, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, Crown, Flame, Coins, TrendingUp, ArrowLeft } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import Header from '../components/common/Header';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const Leaderboard = () => {
     const { fetchLeaderboard } = useGame();
+    const navigate = useNavigate();
     const [players, setPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -32,6 +34,13 @@ const Leaderboard = () => {
             <Header />
             
             <main className="max-w-2xl mx-auto px-4 mt-8">
+                <button 
+                    onClick={() => navigate('/dashboard')}
+                    className="mb-6 flex items-center gap-2 text-green-700 font-bold hover:text-green-900 transition-colors group"
+                >
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    Back to Dashboard
+                </button>
                 <div className="text-center mb-10">
                     <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}

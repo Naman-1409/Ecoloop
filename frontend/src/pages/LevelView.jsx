@@ -5,6 +5,7 @@ import Header from '../components/common/Header';
 import VideoPlayer from '../components/level/VideoPlayer';
 import QuizInterface from '../components/level/QuizInterface';
 import TaskUpload from '../components/level/TaskUpload';
+import { ArrowLeft } from 'lucide-react';
 
 const LevelView = () => {
     const { id } = useParams();
@@ -65,7 +66,14 @@ const LevelView = () => {
         <div className="min-h-screen bg-green-50 pb-20">
             <Header />
 
-            <main className="max-w-4xl mx-auto px-4">
+            <main className="max-w-4xl mx-auto px-4 mt-8">
+                <button 
+                    onClick={() => navigate('/dashboard')}
+                    className="mb-8 flex items-center gap-2 text-green-700 font-bold hover:text-green-900 transition-colors group"
+                >
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    Back to Dashboard
+                </button>
                 <div className="mb-8 text-center pt-8">
                     <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold uppercase tracking-widest text-sm">
                         Level {id}

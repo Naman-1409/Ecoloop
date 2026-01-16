@@ -1,10 +1,12 @@
 import React from 'react';
 import Header from '../components/common/Header';
-import { Award, Droplets, Recycle, Leaf } from 'lucide-react'; 
+import { Award, Droplets, Recycle, Leaf, ArrowLeft } from 'lucide-react'; 
 import { useGame } from '../context/GameContext';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
     const { user } = useGame();
+    const navigate = useNavigate();
 
     if (!user) return <div className="text-center mt-20">Please Login</div>;
 
@@ -65,7 +67,14 @@ const Profile = () => {
         <div className="min-h-screen bg-green-50 pb-20">
             <Header />
 
-            <main className="max-w-4xl mx-auto px-4">
+            <main className="max-w-4xl mx-auto px-4 mt-8">
+                <button 
+                    onClick={() => navigate('/dashboard')}
+                    className="mb-6 flex items-center gap-2 text-green-700 font-bold hover:text-green-900 transition-colors group"
+                >
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    Back to Dashboard
+                </button>
                 {/* Profile Header */}
                 <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 flex flex-col md:flex-row items-center gap-8">
                     <div className="w-32 h-32 bg-green-100 rounded-full border-4 border-green-500 flex items-center justify-center text-6xl shadow-inner overflow-hidden relative">
